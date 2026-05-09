@@ -1,0 +1,135 @@
+% ==================== CHAPTER 3 ====================
+\begin{Arabic}
+\chapter{المنهجية وبنية النظام}
+\clearpage
+
+\section{منهجية البحث والتصميم}
+
+اعتمد هذا المشروع منهجية التطوير التدريجي القائمة على النماذج الأولية (\textenglish{Iterative Prototype-Driven Development})، وهي منهجية تُناسب طبيعة تطوير المكتبات التقنية التي تتطلب اختبار المفاهيم وقياس الأداء في مراحل مبكرة قبل الوصول إلى التصميم النهائي. انطلقت عملية البحث من تحليل المشكلات الموثقة في مكتبات الإيماءات الحالية، ثم صِيغت المتطلبات الوظيفية وغير الوظيفية للمشروع، وانتهت بتصميم بنية معمارية محكمة تُخضع كل قرار تصميمي لاختبارات أداء قابلة للقياس.
+
+\subsection{تحليل المتطلبات}
+
+حُدّدت متطلبات المشروع في ضوء المشكلات الموثقة في الأدبيات التقنية. يُجمل \textenglish{Dabit} \cite{dabit2019} أبرز القيود في نظام \textenglish{PanResponder} الافتراضي بقوله إنه لا يُتيح نقل الحسابات إلى الطبقة الأصلية، مما يجعله عُرضة لتدهور الأداء في التطبيقات المكثفة. استُخلصت من هذا التحليل المتطلبات الوظيفية التالية:
+
+\begin{enumerate}
+    \item دعم خمس فئات أساسية من الإيماءات: الإيماءات المنفصلة الأساسية، وإيماءات السحب والحركة، والإيماءات متعددة الأصابع، والتسلسلات المركبة، والتحويلات الهندسية.
+    \item ضمان معدل أداء لا يقل عن 60 إطاراً في الثانية في جميع أنواع الإيماءات.
+    \item توفير واجهة برمجية (\textenglish{API}) متسقة عبر نمط الخطافات (\textenglish{Hooks}) لجميع الفئات.
+    \item دعم خيارات التهيئة المرنة لكل إيماءة (العتبات الزمنية والمكانية).
+    \item توافق كامل مع نظامَي التشغيل \textenglish{iOS} و\textenglish{Android}.
+    \item دمج بيانات مستشعر التقارب مع نظام الإيماءات في إطار موحد.
+\end{enumerate}
+
+\section{تصميم معمارية النظام المتكاملة}
+
+\begin{itemize}
+    \item \textbf{طبقة الإدخال (\textenglish{Input Layer}):} مسؤولة عن استقبال أحداث اللمس الخام من نظام التشغيل وتوحيد تنسيقها عبر المنصات المختلفة.
+    \item \textbf{طبقة التعرف (\textenglish{Recognition Layer}):} تُنفّذ منطق آلة الحالات للتمييز بين أنواع الإيماءات استناداً إلى متغيرات الزمن والمسافة والسرعة والاتجاه.
+    \item \textbf{طبقة الحركة (\textenglish{Motion Layer}):} تُترجم الإيماءات المُعرَّفة إلى قيم رسوم متحركة (\textenglish{Animation Values}) مستخدمةً \textenglish{Reanimated} و\textenglish{Shared Values}.
+    \item \textbf{طبقة واجهة برمجة التطبيقات (\textenglish{API Layer}):} تُقدم خطافات (\textenglish{Hooks}) ومكونات (\textenglish{Components}) نظيفة وموثقة توجه المطور في دمج الإيماءات بأقل قدر من التعقيد.
+\end{itemize}
+
+\section{اختيار الخوارزميات وتكاملها}
+
+\subsection{خوارزميات التعلم الآلي الأساسية}
+
+يرتكز نظام التعرف على الإيماءات في \textenglish{gesture-kit} على جملة من الخوارزميات الرياضية الدقيقة. تعتمد إيماءة السحب البسيطة على حساب متجه الإزاحة الثنائية الأبعاد:
+
+\begin{equation}
+\vec{d} = (x_1 - x_0,\ y_1 - y_0)
+\end{equation}
+
+بينما تعتمد إيماءة القرص (\textenglish{Pinch}) على نسبة التغيير في المسافة الإقليدية بين نقطتَي اللمس:
+
+\begin{equation}
+\text{Scale} = \frac{d_{\text{current}}}{d_{\text{initial}}} = \frac{\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}}{d_0}
+\end{equation}
+
+أما إيماءة التدوير، فتستند إلى الدالة المثلثية العكسية \textenglish{atan2} لحساب الزاوية بين الإصبعين:
+
+\begin{equation}
+\theta = \text{atan2}(y_2 - y_1,\ x_2 - x_1)
+\end{equation}
+
+وتُحسب إيماءة التدوير الحالية بطرح الزاوية الأولية من الزاوية الحالية: $\Delta\theta = \theta_{\text{current}} - \theta_{\text{initial}}$.
+
+\subsection{توليد المرشحين}
+
+\begin{itemize}
+    \item تُحلَّل جميع أحداث اللمس الواردة في دورة واحدة قبل إطلاق أي حدث للمطور.
+    \item يُطبَّق نظام الأولوية والإقصاء (\textenglish{Exclusive Recognition}) للفصل بين الإيماءات المتضاربة.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{مقارنة خوارزميات التعرف على الإيماءات}
+\label{tab:gesture-algorithms}
+\begin{tabularx}{\textwidth}{XXXX}
+\toprule
+\textbf{الإيماءة} & \textbf{المتغير الرئيسي} & \textbf{العتبة الافتراضية} & \textbf{المسار} \\
+\midrule
+\textenglish{Tap} & الزمن والمسافة & 500ms / 20px & \textenglish{UI Thread} \\
+\rowcolor{gray!10}
+\textenglish{Long Press} & الزمن فقط & 500ms & \textenglish{UI Thread} \\
+\textenglish{Swipe} & السرعة والمسافة & 500px/s / 50px & \textenglish{UI Thread} \\
+\rowcolor{gray!10}
+\textenglish{Pinch} & نسبة المسافة & 0.01 تغيير & \textenglish{UI Thread} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{جمع البيانات، السياق اللغوي، ومواد تدريب النموذج}
+
+اعتمد المشروع على منهجية تطوير قائمة على الاختبار التدريجي (\textenglish{Progressive Testing}). في المرحلة الأولى، اختُبرت الإيماءات الأساسية المنفصلة على أجهزة \textenglish{iOS} و\textenglish{Android} حقيقية لقياس معدل الإطارات وزمن الاستجابة. في المرحلة الثانية، اختُبرت الإيماءات المستمرة تحت أحمال متزامنة متعددة. وفي المرحلة الثالثة، اختُبر دمج بيانات الحساسات مع الإيماءات.
+
+\begin{table}[htbp]
+\centering
+\caption{معايير الأداء المستهدفة لكل فئة من الإيماءات}
+\label{tab:performance-targets}
+\begin{tabularx}{\textwidth}{XXXX}
+\toprule
+\textbf{الفئة} & \textbf{معدل الإطارات} & \textbf{زمن الاستجابة} & \textbf{الاستقرار} \\
+\midrule
+الإيماءات المنفصلة & 60fps & < 16ms & > 99\% \\
+\rowcolor{gray!10}
+السحب والتحريك & 60fps & < 8ms & > 99\% \\
+متعددة الأصابع & 60fps & < 16ms & > 98\% \\
+\rowcolor{gray!10}
+التحويلات الهندسية & 60fps & < 16ms & > 98\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{تدفق النظام ومسار التوصية}
+
+\subsection{استيعاب البيانات وبنية القياس عن بعد}
+
+\begin{enumerate}
+    \item يصل حدث اللمس الخام من نواة نظام التشغيل عبر طبقة تجريد العتاد (\textenglish{HAL}).
+    \item تستقبل مكتبة \textenglish{react-native-gesture-handler} الحدث على مسار الواجهة الأصلية مباشرة دون عبور الجسر.
+\end{enumerate}
+
+\begin{itemize}
+    \item \textenglish{GestureHandler} يُحوّل الأحداث الخام إلى كائنات \textenglish{GestureEvent} منظمة.
+    \item تُعدَّل القيم المشتركة (\textenglish{Shared Values}) مباشرة من مسار الواجهة لضمان الأداء.
+    \item تُطبَّق العتبات (\textenglish{Thresholds}) والفلاتر لتقليل الإيجابيات الكاذبة (\textenglish{False Positives}).
+    \item تُطلق الأحداث الناضجة إلى دوال الاستجابة المُسجَّلة من قبل المطور.
+\end{itemize}
+
+\subsection{مسار التدريب غير المتصل (التحليل العواملي الكامن)}
+
+\begin{itemize}
+    \item تُحدد قيم العتبات الافتراضية بناءً على اختبارات إمبيريقية تُجرى على أجهزة متنوعة.
+    \item تُراجع قيم عوامل الأداء (\textenglish{Performance Factors}) دورياً مع كل إصدار جديد.
+    \item تُوثَّق معاملات التهيئة بالكامل للسماح للمطورين بتعديل السلوك وفق احتياجاتهم.
+\end{itemize}
+
+\subsection{مسار الاسترجاع المتصل}
+
+\begin{enumerate}
+    \item استقبال أحداث اللمس في الوقت الفعلي.
+    \item تشغيل خوارزمية التعرف على الإيماءة.
+    \item تحديث القيم المشتركة وإطلاق أحداث المطور.
+\end{enumerate}
+
+\end{Arabic}

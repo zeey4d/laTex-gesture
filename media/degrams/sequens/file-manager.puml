@@ -1,0 +1,189 @@
+@startuml
+autonumber
+skinparam boxPadding 10
+skinparam participantPadding 10
+skinparam style strictuml
+
+title File Manager with RTK Query & Spatie Permissions
+
+actor "User" as User
+box "Frontend (React + Redux Toolkit)" #E3F2FD
+    participant "File Manager UI" as UI
+    participant "RTK Query\n(fileManagerApi)" as RTK
+end box
+
+box "Backend (Laravel API)" #E8F5E9
+    participant "Spatie\nMiddleware" as Auth
+    participant "FileController" as API
+    participant "Storage Facade" as Disk
+end box
+
+== 1. Fetch Files (Query) ==
+
+User -> UI: Load / Navigate to Folder
+activate UI
+
+UI -> RTK: useGetFilesQuery('/docs')
+activate RTK
+
+RTK -> RTK: Check Cache ('Files', id: '/docs')
+
+alt Cache Miss / Stale
+    RTK -> Auth: GET /api/files?path=/docs
+    activate Auth
+    
+    Auth -> Auth: user->can('read files')
+    
+    Auth -> API: Request Allowed
+    activate API
+    
+    API -> Disk: Storage::files('/docs')
+    activate Disk
+    Disk --> API: List of files
+    deactivate Disk
+    
+    API --> RTK: 200 OK [File Array]
+    deactivate API
+    deactivate Auth
+
+    RTK -> RTK: Store in Cache\nProvide Tag: ['Files']
+end
+
+RTK --> UI: { data: [...], isLoading: false }
+deactivate RTK
+UI -> User: Render File List
+
+== 2. Create Folder (Mutation) ==
+
+User -> UI: Click "New Folder" -> Enter Name
+UI -> RTK: useCreateFolderMutation({ path: '/', name: 'Images' })
+activate RTK
+
+RTK -> Auth: POST /api/files/folder
+activate Auth
+Auth -> Auth: user->can('create folders')
+
+Auth -> API: Request Allowed
+activate API
+API -> Disk: Storage::makeDirectory('/Images')
+API --> RTK: 200 OK { message: "Created" }
+deactivate API
+deactivate Auth
+
+RTK -> RTK: **Invalidate Tags: ['Files']**
+note right of RTK
+    RTK Query detects invalidation.
+    Triggers auto-refetch of active queries.
+end note
+
+RTK -> Auth: GET /api/files?path=/ (Auto Refetch)
+activate Auth
+Auth -> API: ...
+API --> RTK: Returns Updated List (with 'Images')
+deactivate Auth
+RTK --> UI: UI Updates Automatically
+deactivate RTK
+
+== 3. Upload File (Mutation) ==
+
+User -> UI: Upload "photo.jpg"
+UI -> RTK: useUploadFileMutation(FormData)
+activate RTK
+
+RTK -> Auth: POST /api/files/upload
+activate Auth
+Auth -> Auth: user->can('upload files')
+
+Auth -> API: Request Allowed
+activate API
+API -> Disk: Storage::putFileAs(...)
+API --> RTK: 200 OK
+deactivate API
+deactivate Auth
+
+RTK -> RTK: **Invalidate Tags: ['Files']**
+RTK -> Auth: GET /api/files?path=/ (Auto Refetch)
+activate Auth
+Auth -> API: ...
+API --> RTK: Returns Updated List
+deactivate Auth
+RTK --> UI: UI Updates Automatically
+deactivate RTK
+
+== 4. Rename Item (Mutation) ==
+
+User -> UI: Rename "photo.jpg" to "pic.jpg"
+UI -> RTK: useRenameMutation({ old: 'photo.jpg', new: 'pic.jpg' })
+activate RTK
+
+RTK -> Auth: POST /api/files/rename
+activate Auth
+Auth -> Auth: user->can('rename files')
+
+Auth -> API: Request Allowed
+activate API
+API -> Disk: Storage::move('photo.jpg', 'pic.jpg')
+API --> RTK: 200 OK
+deactivate API
+deactivate Auth
+
+RTK -> RTK: **Invalidate Tags: ['Files']**
+RTK -> Auth: GET /api/files?path=/ (Auto Refetch)
+activate Auth
+Auth -> API: ...
+API --> RTK: Returns Updated List
+deactivate Auth
+RTK --> UI: UI Updates Automatically
+deactivate RTK
+
+== 5. Download File (Lazy Query) ==
+
+User -> UI: Click Download "report.pdf"
+UI -> RTK: triggerDownload('/report.pdf')
+activate RTK
+
+RTK -> Auth: GET /api/files/download?path=/report.pdf
+activate Auth
+Auth -> Auth: user->can('download files')
+
+Auth -> API: Request Allowed
+activate API
+API -> Disk: Storage::download('/report.pdf')
+activate Disk
+Disk --> API: Stream Binary
+deactivate Disk
+API --> RTK: Blob / Binary Stream
+deactivate API
+deactivate Auth
+
+RTK --> UI: Return Blob
+deactivate RTK
+UI -> User: Browser prompts "Save As"
+
+== 6. Delete Item (Mutation) ==
+
+User -> UI: Select "pic.jpg" -> Delete
+UI -> RTK: useDeleteMutation({ path: 'pic.jpg' })
+activate RTK
+
+RTK -> Auth: DELETE /api/files/delete
+activate Auth
+Auth -> Auth: user->can('delete files')
+
+Auth -> API: Request Allowed
+activate API
+API -> Disk: Storage::delete('pic.jpg')
+API --> RTK: 200 OK
+deactivate API
+deactivate Auth
+
+RTK -> RTK: **Invalidate Tags: ['Files']**
+RTK -> Auth: GET /api/files?path=/ (Auto Refetch)
+activate Auth
+Auth -> API: ...
+API --> RTK: Returns Updated List (without 'pic.jpg')
+deactivate Auth
+RTK --> UI: UI Updates Automatically
+deactivate RTK
+
+@enduml

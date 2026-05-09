@@ -1,0 +1,36 @@
+[database]
+# Define which actions Gorse should track as "Positive"
+positive_feedback_types = [
+    "author_interaction", "reply", "profile_click", "dwell_deep", 
+    "quote", "follow", "repost", "link_click", "like", "bookmark"
+]
+
+# Define which actions are "Negative"
+# Note: Gorse treats non-positive 'read' events as implicit negatives, 
+# but explicit negatives (Report/Block) can be handled via 'read_feedback_types' 
+# or custom logic in the ranking layer.
+read_feedback_types = ["report", "block", "mute", "not_interested"]
+
+[recommend.feedback_weights]
+# --- HIGH VALUE BOOSTS ---
+author_interaction = 75.0   # Author replied to you
+reply = 13.5                # You replied to the post
+profile_click = 12.0        # Visit profile + interaction
+dwell_deep = 11.0           # Stay in thread >= 2 mins
+quote = 10.0                # Quote Tweet
+follow = 4.0                # New follow after seeing post
+
+# --- STANDARD BOOSTS ---
+repost = 1.0                # Retweet
+link_click = 1.0            # External/Internal link click
+like = 0.5                  # Standard favorite
+bookmark = 0.5              # Saving for later
+media_expand = 0.4          # Photo/Video full screen
+
+# --- NEGATIVE WEIGHTS ---
+# (Usually implemented as negative multipliers in the Ranking phase)
+report = -369.0             # Massive penalty
+block = -74.0               # Strong exclusion
+mute = -74.0                # Strong exclusion
+not_interested = -74.0      # Content filtering
+unfollow = -20.0            # Direct loss of interest

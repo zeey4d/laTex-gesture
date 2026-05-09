@@ -1,0 +1,45 @@
+% ==================== CHAPTER 5 ====================
+\begin{Arabic}
+\chapter{الخاتمة والتوصيات}
+\clearpage
+
+\section{ملخص النتائج}
+
+حقق هذا المشروع هدفه الرئيسي المتمثل في تصميم وبناء إطار عمل موحد ومتقدم لمعالجة إيماءات اللمس والحساسات في تطبيقات \textenglish{React Native} متعددة المنصات. يُقدم \textenglish{gesture-kit} منظومةً متكاملةً من سبع حزم تغطي الطيف الكامل من التفاعلات: من الضغطة البسيطة، مروراً بالتحويلات الهندسية المزدوجة، وصولاً إلى إيماءات التقارب (\textenglish{Proximity}) والإيماءات الحركية (\textenglish{Shake, Tilt, Flip}) المستندة إلى مقياس التسارع والجيروسكوب.
+
+تُكشف النتائج المعمارية عن نجاح النهج المعتمد في تجاوز القيد الجوهري المتمثل في تأخير الجسر (\textenglish{Bridge Latency}). يعمل كامل منطق التعرف على الإيماءات على مسار الواجهة الأصلية (\textenglish{UI Thread}) مستفيداً من مكتبتَي \textenglish{react-native-gesture-handler} و\textenglish{react-native-reanimated}. وقد أثبتت التقييمات الأدائية أن الإطار يحافظ على معدل 60 إطاراً في الثانية في جميع سيناريوهات الاختبار، بما فيها الإيماءات المتزامنة ومزدوجة الأصابع وإيماءات الحساسات.
+
+تُوفر حزمتا \textenglish{gesture-kit-proximity} و\textenglish{gesture-kit-sensor} قدرات إيمائية غير مسبوقة في بيئة \textenglish{React Native}: إيماءات لاّلمسية كالتقارب والتحوم (\textenglish{Hover})، وإيماءات فيزيائية كالهز (\textenglish{Shake}) والإمالة (\textenglish{Tilt}) والسقوط الحر (\textenglish{Free Fall})، مفتوحةً الباب أمام تطبيقات الأمان الذكي وتجارب الواقع المعزز وإمكانية الوصول.
+
+علاوة على ذلك، أسهمت آلية تصميم الخطافات (\textenglish{Hooks}) المعيارية في تقليل كمية الكود اللازمة لدمج الإيماءات بأكثر من 60\% مقارنةً بالحلول التقليدية، مُجسّدةً مبدأ المسؤولية الواحدة الذي يُوصي به \textenglish{Casciaro} و\textenglish{Mammino} \cite{casciaro2020}.
+
+\section{الخاتمة}
+
+يُجيب هذا البحث عن سؤال جوهري في مجال تطوير تطبيقات \textenglish{React Native}: كيف يمكن تقديم واجهة برمجية موحدة وعالية الأداء تُعالج الطيف الكامل من إيماءات اللمس والحساسات دون التضحية بسلاسة الاستجابة؟
+
+يكمن الجواب في ثلاثة مبادئ معمارية متضافرة:
+\begin{enumerate}
+    \item نقل المعالجة بأكملها إلى المسار الأصلي (\textenglish{UI Thread}) لتحقيق 60fps ثابتة.
+    \item تجريد التعقيد خلف واجهة خطافات نظيفة تعتمد على الأنواع (\textenglish{TypeScript Types}) لضمان سلامة الكود.
+    \item تصميم كل حزمة باستقلالية وفق مبدأ المسؤولية الواحدة، مع إتاحة تركيبها عبر آلية \textenglish{Gesture.Race()} و\textenglish{Gesture.Exclusive()} لسيناريوهات أعقد.
+\end{enumerate}
+
+يتوافق هذا العمل مع ما أكده \textenglish{Masiello} و\textenglish{Friedmann} \cite{masiello2017} من أن الأداء الحقيقي في واجهات اللمس لا يُحقَّق بتحسينات تدريجية في مسار \textenglish{JavaScript}، بل بإعادة هيكلة معمارية جذرية تُزيح المعالجة إلى الطبقة الأصلية.
+
+\section{التوصيات والأعمال المستقبلية}
+
+\begin{enumerate}
+    \item \textbf{دعم إيماءات إمكانية الوصول (\textenglish{Accessibility Gestures}):} توسيع حزمة \textenglish{gesture-kit-proximity} لتشمل إيماءات هوائية مُحسَّنة تُعوّض غياب اللمس لدى المستخدمين ذوي الإعاقات الحركية، مستفيدةً من خاصية \textenglish{isNear} في \textenglish{ProximityEvent}.
+
+    \item \textbf{تحسين حزمة الحساسات بمعالجة إشارات متقدمة:} دمج خوارزميات تصفية (\textenglish{Kalman Filter} أو \textenglish{Low-pass Filter}) لتنعيم بيانات \textenglish{Accelerometer} والتخلص من ضوضاء القراءات الخام، مما يُقلل الإيجابيات الكاذبة في إيماءة \textenglish{Shake}.
+
+    \item \textbf{التوسع نحو الواقع المعزز والمختلط:} استناداً إلى إيماءات \textenglish{MultiAxisTilt} و\textenglish{CircularMotion} المتوفرة في \textenglish{gesture-kit-sensor}، يُوصى بتطوير حزمة مستقلة \textenglish{gesture-kit-ar} توفر إيماءات متخصصة لأجهزة \textenglish{AR/VR}.
+
+    \item \textbf{بناء أدوات التطوير والتصحيح (\textenglish{DevTools}):} تطوير ملحق لأدوات \textenglish{React Developer Tools} يُتيح مراقبة حالات الإيماءات (\textenglish{BEGAN, ACTIVE, END}) وزمن استجابتها في الوقت الفعلي أثناء التطوير، مما يُسرّع تشخيص مشكلات التضارب بين الإيماءات.
+
+    \item \textbf{النشر الرسمي على \textenglish{npm}:} استناداً إلى مبادئ \textenglish{Casciaro} و\textenglish{Mammino} \cite{casciaro2020} في نشر المكتبات الاحترافية، يُوصى بوضع خطة نشر رسمية تشمل التوثيق التفاعلي (\textenglish{Storybook}) وأمثلة \textenglish{Expo Snack} وموقعاً تفصيلياً لمنظومة \textenglish{gesture-kit}.
+
+    \item \textbf{دعم \textenglish{React Native New Architecture}:} مع انتقال \textenglish{React Native} من الجسر التقليدي إلى \textenglish{JSI (JavaScript Interface)}، يُوصى بمراجعة بنية الحزم لضمان التوافق الكامل مع المعمارية الجديدة والاستفادة القصوى من \textenglish{Turbo Modules}.
+\end{enumerate}
+
+\end{Arabic}

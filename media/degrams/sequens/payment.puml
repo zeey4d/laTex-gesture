@@ -1,0 +1,130 @@
+@startuml
+autonumber
+skinparam boxPadding 10
+skinparam participantPadding 10
+skinparam style strictuml
+
+title HyperPay "Copy and Pay" Flow (Unified Order & Payment Request)
+
+actor "User" as User
+box "Frontend (Next.js)" #E3F2FD
+    participant "Payment Page" as NextPage
+    participant "Callback Page" as NextResult
+end box
+
+box "Backend (Laravel API)" #E8F5E9
+    participant "PaymentController" as API
+    participant "OrderService" as Service
+end box
+
+box "MySQL Database" #FFF8E1
+    participant "oc_order" as OrderTB
+    participant "oc_hyperpay_payment" as HyperTB
+    participant "oc_order_history" as HistoryTB
+end box
+
+box "Gateway" #ECEFF1
+    participant "HyperPay API" as Gateway
+end box
+
+== Phase 1: Order Creation & Checkout Initialization ==
+
+User -> NextPage: Select Payment Method & Click "Proceed"
+activate NextPage
+
+NextPage -> API: POST /api/orders/create\n(shipping_address_id, payment_method, etc.)
+activate API
+
+API -> Service: createOrder(data)
+activate Service
+Service -> OrderTB: INSERT INTO oc_order\n(customer_id, status=1 'Pending', total=...)
+activate OrderTB
+OrderTB --> Service: order_id: 1001
+deactivate OrderTB
+Service --> API: order object
+deactivate Service
+
+API -> Gateway: POST /v1/checkouts\n(entityId, amount, currency, merchantTransactionId=1001)
+activate Gateway
+Gateway --> API: { "id": "CH-12345-XYZ", "result": {...} }
+deactivate Gateway
+
+API -> HyperTB: INSERT INTO oc_hyperpay_payment\n(order_id=1001, checkout_id="CH-12345-XYZ", status="pending")
+activate HyperTB
+HyperTB --> API: Success
+deactivate HyperTB
+
+API --> NextPage: 200 OK\n{ message: "...", data: { order_id: 1001, checkout_id: "CH-12345-XYZ" } }
+deactivate API
+
+== Phase 2: Payment Widget (Copy and Pay) ==
+
+NextPage -> NextPage: render HyperPayWidget\ncheckoutId="CH-12345-XYZ", orderId=1001
+NextPage -> NextPage: Inject Script\nsrc=".../paymentWidgets.js?checkoutId=CH-12345-XYZ"
+NextPage -> User: Display Payment Form (Iframe)
+deactivate NextPage
+
+User -> Gateway: Enter Card Data & Submit
+activate Gateway
+note right of Gateway
+    HyperPay processes card.
+    3D Secure verification if needed.
+end note
+Gateway --> User: Redirect to shopperResultUrl\n/checkout/callback?order_id=1001&resourcePath=...
+deactivate Gateway
+
+== Phase 3: Payment Verification & DB Update ==
+
+User -> NextResult: Lands on /checkout/callback\n(params: resourcePath, id, order_id)
+activate NextResult
+
+NextResult -> API: GET /api/payment/verify\n?resourcePath=...&orderId=1001
+activate API
+
+API -> Gateway: GET {resourcePath}\nAuthorization: Bearer Token
+activate Gateway
+Gateway --> API: { "id": "8a82944a...", "result": { "code": "000.100.110", "description": "Success" }, ... }
+deactivate Gateway
+
+alt Payment Successful (Regex match ^000.000.|^000.100.110)
+
+    API -> HyperTB: UPDATE oc_hyperpay_payment\nSET status='paid', payment_id='...', result_code='000.100.110'
+    activate HyperTB
+    HyperTB --> API: Updated
+    deactivate HyperTB
+
+    API -> OrderTB: UPDATE oc_order\nSET order_status_id=5 (Complete/Paid)
+    activate OrderTB
+    OrderTB --> API: Updated
+    deactivate OrderTB
+
+    API -> HistoryTB: INSERT INTO oc_order_history\n(order_id=1001, status=5, comment="Paid via HyperPay")
+    activate HistoryTB
+    deactivate HistoryTB
+
+    API --> NextResult: 200 OK { success: true, orderId: 1001 }
+    NextResult -> User: Redirect -> /checkout/success?order_id=1001
+
+else Payment Failed
+
+    API -> HyperTB: UPDATE oc_hyperpay_payment\nSET status='failed', result_code='...'
+    activate HyperTB
+    deactivate HyperTB
+
+    API -> OrderTB: UPDATE oc_order\nSET order_status_id=10 (Failed)
+    activate OrderTB
+    deactivate OrderTB
+
+    API -> HistoryTB: INSERT INTO oc_order_history\n(order_id=1001, status=10, comment="Payment Failed")
+    activate HistoryTB
+    deactivate HistoryTB
+
+    API --> NextResult: 200 OK { success: false, orderId: 1001, message: "Declined" }
+    NextResult -> User: Redirect -> /checkout/failed?order_id=1001
+
+end
+
+deactivate API
+deactivate NextResult
+
+@enduml

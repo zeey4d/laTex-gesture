@@ -1,0 +1,75 @@
+% ==================== CHAPTER 1 ====================
+\begin{Arabic}
+\chapter{المقدمة}
+\clearpage
+
+\section{خلفية الدراسة}
+
+شهد مجال تطوير تطبيقات الهواتف الذكية تطوراً متسارعاً في السنوات الأخيرة، لا سيما مع ظهور أطر العمل متعددة المنصات التي أتاحت للمطورين إمكانية بناء تطبيقات متكاملة تعمل على كلٍّ من نظامَي التشغيل \textenglish{iOS} و\textenglish{Android} بقاعدة شفرة مصدرية موحدة. في طليعة هذه الأطر يأتي \textenglish{React Native}، الذي وصفه \textenglish{Dabit} \cite{dabit2019} بأنه إطار يُتيح بناء تطبيقات أصلية (\textenglish{Native Applications}) حقيقية، لا تطبيقات ويب مُغلَّفة، وذلك عبر جسر تواصل (\textenglish{The Bridge}) يربط بيئة \textenglish{JavaScript} بواجهات برمجة النظام الأصلية مباشرةً.
+
+ومع تزايد الاعتماد على الأجهزة اللمسية وتطور واجهات المستخدم التفاعلية، باتت إيماءات اللمس (\textenglish{Touch Gestures}) عنصراً محورياً في تصميم تجربة المستخدم الحديثة. ويُعدّ التعامل مع هذه الإيماءات مهمةً دقيقةً ومعقدةً من الناحية التقنية؛ إذ تتطلب الاستجابة الفورية لأنماط متعددة كالسحب (\textenglish{Pan})، والتكبير (\textenglish{Pinch})، والتدوير (\textenglish{Rotation})، والضغط المطوَّل (\textenglish{Long Press})، فضلاً عن إيماءات الحساسات كالهز (\textenglish{Shake}) والإمالة (\textenglish{Tilt}) والتقارب (\textenglish{Proximity}). وقد أكد \textenglish{Masiello} و\textenglish{Friedmann} \cite{masiello2017} أن تحقيق سلاسة التفاعل عند معدل 60 إطاراً في الثانية (\textenglish{60fps}) يستلزم نقل معالجة الإيماءات الحرجة إلى طبقة الواجهة الأصلية (\textenglish{Native Layer}) متى أمكن ذلك.
+
+ويتمثل التحدي الأكبر في هذا السياق في بناء حل مرن وموثوق وقابل لإعادة الاستخدام يمكن توزيعه على مجتمع المطورين عبر مستودعات الحزم العامة كـ\textenglish{npm}. وقد أكد \textenglish{Casciaro} و\textenglish{Mammino} \cite{casciaro2020} أن المكتبة الجيدة يجب أن تلتزم بمبدأ المسؤولية الواحدة (\textenglish{Single Responsibility Principle})، وتُعلن صراحةً عن التبعيات المطلوبة عبر آلية \textenglish{peerDependencies} لتجنب تعارض الإصدارات.
+
+\section{مشكلة البحث}
+
+على الرغم من توفر بعض المكتبات في بيئة \textenglish{React Native} للتعامل مع إيماءات اللمس، إلا أنها تفتقر في الغالب إلى ثلاثة عناصر جوهرية: أولها التكامل المباشر مع بيانات مستشعرات الجهاز (كحساس التقارب \textenglish{Proximity Sensor} ومقياس التسارع \textenglish{Accelerometer}) في آنٍ واحد مع إيماءات الشاشة اللمسية. وثانيها واجهة برمجية (\textenglish{API}) موحدة تجمع كافة فئات الإيماءات تحت مظلة واحدة متسقة. وثالثها توثيق احترافي وهيكل نشر سليم يستوفي معايير المجتمع المفتوح المصدر.
+
+يصف \textenglish{Dabit} \cite{dabit2019} نظام الاستجابة الافتراضي لـ\textenglish{React Native} وهو \textenglish{PanResponder} بأنه قادر على تتبع حركات اللمس الأساسية، غير أنه يُنفّذ معالجته بالكامل على مسار \textenglish{JavaScript}، مما يجعله عُرضةً للتأثر بضغط الحسابات وانخفاض معدل الإطارات. ويزيد من تعقيد هذه المشكلة غيابُ دعم إيماءات الحساسات الفيزيائية كالهز والإمالة والتقارب ضمن أي إطار موحد.
+
+\section{أهداف المشروع}
+
+يهدف هذا المشروع إلى:
+\begin{enumerate}
+    \item تصميم وبناء حزم \textenglish{JavaScript} مخصصة لبيئة \textenglish{React Native} تُعنى بمعالجة إيماءات اللمس وربطها بمعطيات المستشعرات الحركية في الوقت الفعلي.
+    \item توفير واجهات برمجية (\textenglish{Hooks \& Components}) سهلة الاستخدام للتعامل مع كامل طيف الإيماءات: من الضغطة البسيطة حتى التحويلات الهندسية المزدوجة وإيماءات الحساسات.
+    \item دمج بيانات المستشعرات --- مقياس التسارع والجيروسكوب وحساس التقارب --- مع أحداث اللمس لتقديم استجابة سياقية أكثر دقةً وذكاءً.
+    \item نشر المكتبة على منصة \textenglish{npm} وفق المعايير المهنية، بما يشمل التوثيق الكامل وإعداد التبعيات وإصدار دلالي منضبط.
+    \item تحقيق أداء مستقر عند 60 إطاراً في الثانية عبر نقل المعالجة إلى \textenglish{UI Thread} مباشرةً.
+\end{enumerate}
+
+\section{هيكل المكتبة --- نظرة عامة}
+
+تتكوّن \textenglish{gesture-kit} من سبع حزم رئيسية موزعة على مستودعَين (\textenglish{Monorepo}):
+
+\begin{table}[htbp]
+\centering
+\caption{حزم \textenglish{gesture-kit} والإيماءات التي تدعمها}
+\label{tab:packages}
+\begin{tabularx}{\textwidth}{XXX}
+\toprule
+\textbf{اسم الحزمة} & \textbf{الفئة} & \textbf{الإيماءات الرئيسية} \\
+\midrule
+\textenglish{gesture-kit-basic-touch} & لمس أساسي & \textenglish{Tap, Double Tap, Long Press} \\
+\rowcolor{gray!10}
+\textenglish{gesture-kit-drag-pan} & حركة وسحب & \textenglish{Pan, Drag, Swipe, Fling} \\
+\textenglish{gesture-kit-multi-finger} & متعدد الأصابع & \textenglish{Pinch, Spread, Multi-Swipe} \\
+\rowcolor{gray!10}
+\textenglish{gesture-kit-transform} & تحويلات & \textenglish{Rotation, Scale, Combined} \\
+\textenglish{gesture-kit-sequences} & تسلسلات & \textenglish{Tap\&Hold, Complex Chains} \\
+\rowcolor{gray!10}
+\textenglish{gesture-kit-proximity} & تقارب & \textenglish{HandNear, Hover, ProximityTap} \\
+\textenglish{gesture-kit-sensor} & حساسات & \textenglish{Shake, Tilt, Flip, FreeFall} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{أهمية الدراسة}
+
+تُسهم هذه المكتبة في ردم الفجوة التقنية بين واجهات تفاعل المستخدم ومعطيات مستشعرات الجهاز. تتجلى أهميتها في محورين رئيسيين:
+
+\textbf{أولاً --- الصعيد التقني:} أثبت \textenglish{Masiello} و\textenglish{Friedmann} \cite{masiello2017} أن دمج بيانات الحساسات مع الإيماءات يفتح آفاقاً واسعة لتطبيقات الواقع المعزز والألعاب التفاعلية وتطبيقات إمكانية الوصول (\textenglish{Accessibility}). وبتوفير \textenglish{gesture-kit} لدعم حساس التقارب وإيماءات الهز والإمالة، تُصبح تجارب التفاعل اللاّلمسية (\textenglish{Touchless Interactions}) في متناول أي مطور.
+
+\textbf{ثانياً --- صعيد المجتمع التقني:} يُشكّل نشرها مفتوح المصدر على \textenglish{npm} مرجعاً قياسياً يُتبنّى في مشاريع تجارية وأكاديمية. ويُؤكد \textenglish{Casciaro} و\textenglish{Mammino} \cite{casciaro2020} أن التصميم الجيد للمكتبات المفتوحة المصدر يُعزز ثقافة المشاركة ويُقلص تكاليف التطوير في مشاريع لا تُحصى.
+
+\section{نطاق الدراسة وحدودها}
+
+يقتصر نطاق هذا المشروع على بيئة \textenglish{React Native} مع التركيز على الإيماءات اللمسية وبيانات المستشعرات المدمجة في الهاتف. أما حدود المشروع فهي:
+\begin{itemize}
+    \item لا يتناول المشروع معالجة إشارات المستشعرات الخارجية (كأجهزة \textenglish{Bluetooth} أو الإكسسوارات الخارجية).
+    \item لا يشمل دعم أُطر عمل تطوير التطبيقات الأخرى كـ\textenglish{Flutter} أو \textenglish{Ionic}.
+    \item يقتصر اختبار الأداء على الأجهزة المتاحة في بيئة التطوير.
+    \item لا يتناول المشروع معالجة بيانات المستشعرات على مستوى الخادم.
+\end{itemize}
+
+\end{Arabic}

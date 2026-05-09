@@ -1,0 +1,191 @@
+\documentclass[12pt,a4paper]{report}
+
+% ============================================================
+%  IEEE-Compliant FYP Report
+%  Formatting per Project_Guidelines.pdf & latex-ieee-formatting skill
+% ============================================================
+
+% --- Packages ---
+\usepackage{fontspec}
+\setmainfont{Simplified Arabic}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, backgrounds, fit, calc}
+\usepackage[left=1.5in,top=1in,bottom=1in,right=1in]{geometry} % 1.5in binding margin
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{amsmath, amssymb}       % For ML formulas
+\usepackage{graphicx}
+\usepackage[nottoc,notlof,notlot]{tocbibind}
+\usepackage{parskip}
+\usepackage{caption}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{algorithm2e}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\setotherlanguage{arabic}
+\newfontfamily\arabicfont[Script=Arabic, Ligatures=Required]{Simplified Arabic}
+
+\usepackage[backend=biber]{biblatex} % For citations
+\usepackage{minted}                 % For your Go/Laravel code snippets
+\usepackage{neuralnetwork}
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% --- Settings ---
+\doublespacing
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% Chapter title formatting: CHAPTER X prefix, centered, bold
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\centering}
+  {CHAPTER \thechapter}{0pt}{\Huge}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+% ============================================================
+\begin{document}
+
+% ==============================
+%  PART 1: FRONT MATTER
+%  Roman numeral page numbering
+% ==============================
+\pagenumbering{roman}
+\titlespacing*{\chapter}{0pt}{-30pt}{20pt}
+
+% -------------------- TITLE PAGE --------------------
+\input{0_TITLE.tex}
+
+% -------------------- DECLARATION --------------------
+\begin{Arabic}
+\chapter*{الإقرار}
+
+نحن، الموقعون أدناه، طلاب كلية الهندسة وتقنية المعلومات في جامعة تعز، نقر بأن مشروع التخرج المعنون ``مكتبة إيماءات اللمس المتقدمة لتطبيقات React Native'' هو عملنا الأصلي.
+
+وحسب علمنا، فإن هذا المستند لا يحتوي على أي مواد سبق نشرها أو كتابتها من قبل شخص آخر، ولا مواد تم قبولها للحصول على أي درجة أو دبلوم آخر في هذه الجامعة أو أي مؤسسة تعليمية أخرى، باستثناء ما تمت الإشارة إليه في النص. ونقر باستخدام أطر العمل مفتوحة المصدر والمراجع التقنية وفقاً لتراخيصها، والتي تم توثيقها بالكامل داخل التقرير.
+
+% -------------------- APPROVAL PAGE --------------------
+\chapter*{صفحة الاعتماد}
+
+تم فحص واعتماد مشروع التخرج هذا المعنون ``مكتبة إيماءات اللمس المتقدمة لتطبيقات React Native'' كجزء من متطلبات الحصول على درجة البكالوريوس في هندسة البرمجيات.
+
+\vspace{1.5cm}
+
+\noindent\textbf{مشرف المشروع:}\\
+\noindent\rule{8cm}{0.4pt}\\
+د. زياد الربيع\\
+التاريخ: \rule{4cm}{0.4pt}
+
+\vspace{0.75cm}
+
+\noindent\textbf{الممتحن الداخلي:}\\
+\noindent\rule{8cm}{0.4pt}\\
+الاسم: \rule{5cm}{0.4pt}\\
+التاريخ: \rule{4cm}{0.4pt}
+
+\vspace{0.75cm}
+
+\noindent\textbf{رئيس القسم:}\\
+\noindent\rule{8cm}{0.4pt}\\
+الاسم: \rule{5cm}{0.4pt}\\
+التاريخ: \rule{4cm}{0.4pt}
+
+% -------------------- DEDICATION --------------------
+\chapter*{الإهداء}
+
+نهدي هذا المشروع إلى عائلاتنا، التي لولا دعمها اللامحدود، وصبرها، وتشجيعها لما أمكننا إتمام مسيرتنا الأكاديمية. كما نهدي هذا العمل إلى أساتذتنا وإلى مجتمع البرمجيات مفتوحة المصدر، الذين ألهمتنا أدواتهم الأساسية ومعارفهم المشتركة. وأخيراً، نهدي هذا العمل إلى وطننا الحبيب اليمن، آملين أن نساهم في تقدمه التكنولوجي ومستقبله المشرق.
+
+% -------------------- ACKNOWLEDGEMENTS --------------------
+\chapter*{شكر وتقدير}
+
+أولاً وقبل كل شيء، نشكر الله عز وجل على منحنا القوة والصحة والحكمة لإتمام هذا المشروع بنجاح.
+
+نود أن نعرب عن أعمق امتناننا لمشرف مشروعنا، د. زياد الربيع، لتوجيهاته القيمة، وملاحظاته البناءة، ودعمه المستمر طوال فترة تطوير هذا البحث.
+
+كما نتقدم بخالص الشكر والتقدير لأعضاء هيئة التدريس في كلية الهندسة وتقنية المعلومات بجامعة تعز لتزويدنا بالمعرفة الأساسية اللازمة للقيام بمشروع بهذا الحجم التقني.
+\end{Arabic}
+
+
+% -------------------- ARABIC ABSTRACT --------------------
+\chapter*{\textarabic{الملخص}}
+
+\begin{Arabic}
+\begingroup
+\fontsize{11pt}{13.2pt}\selectfont
+مع تطور تطبيقات الهواتف الذكية وتزايد تعقيد واجهات المستخدم، أصبحت إيماءات اللمس عنصراً حيوياً لتوفير تجربة مستخدم سلسة وتفاعلية. يواجه مطورو التطبيقات متعددة المنصات (مثل \textenglish{React Native}) تحديات مستمرة تتمثل في تأخر الاستجابة الملحوظ الناتج عن تمرير الأحداث عبر الجسر (\textenglish{The Bridge}) بين الواجهة الأصلية للنظام وبيئة \textenglish{JavaScript}. يهدف هذا المشروع إلى تصميم وتطوير إطار عمل موحد ومتقدم (\textenglish{Gesture Framework}) مخصص لمعالجة إيماءات اللمس بمختلف مستوياتها، بحيث يتجاوز هذه القيود المعمارية ويضمن أداءً فائقاً بمعدل 60 إطاراً في الثانية.
+
+يُقدم هذا الإطار منظومة شاملة تتكون من خمس حزم أساسية تغطي طيفاً واسعاً من التفاعلات: بدءاً من الإيماءات الأساسية والمنفصلة (كالضغطة المزدوجة والضغط المطول)، مروراً بإيماءات السحب والانزلاق المتصلة (\textenglish{Drag/Pan})، وصولاً إلى الإيماءات متعددة الأصابع والتحويلات الهندسية المعقدة (مثل إيماءة القرص للتكبير والتدوير المتزامن). ويعتمد التصميم المعماري للمشروع بشكل جوهري على نقل معالجة الإيماءات بالكامل إلى مسار الواجهة الأصلية (\textenglish{UI Thread}) بالاعتماد على مكتبة \textenglish{react-native-gesture-handler} والمتغيرات المشتركة في \textenglish{Reanimated}، مما يُلغي الاختناقات المرتبطة بالجسر. بالإضافة إلى ذلك، يوسع الإطار قدراته ليدمج بيانات الحساسات (مثل مستشعر التقارب \textenglish{Proximity}) ومحرك رسم عالي الأداء لتنفيذ تطبيقات التوقيع الرقمي والتفاعلات المتقدمة.
+
+أظهرت التقييمات المعمارية نجاح هذا النهج في تحقيق تفاعل شبه فوري وتوفير استقرار مرجعي عالٍ. ومن خلال تقديم واجهة برمجة تطبيقات (\textenglish{API}) نظيفة ومستقرة عبر خطافات (\textenglish{Hooks}) مخصصة، يوفر الإطار حلاً جذرياً يُسهّل على مجتمع المطورين دمج التفاعلات الحركية المعقدة في تطبيقاتهم، مما يعزز من جودة تجربة المستخدم عبر مختلف المنصات دون المساس بسرعة الاستجابة.
+\par\endgroup
+\end{Arabic}
+
+
+% -------------------- ENGLISH ABSTRACT --------------------
+\chapter*{ABSTRACT}
+
+\begingroup
+\fontsize{11pt}{13.2pt}\selectfont
+As smartphones evolve and user interfaces grow increasingly complex, touch gestures have become a vital component for delivering seamless and interactive user experiences. Cross-platform application developers (such as those using React Native) face persistent challenges regarding noticeable response latency caused by event serialization across ``The Bridge'' between the native platform and the JavaScript environment. This project aims to design and develop a unified, advanced Gesture Framework tailored for processing touch gestures across all complexities, bypassing architectural constraints to guarantee high performance at a consistent 60 frames per second (fps).
+
+The framework introduces a comprehensive ecosystem comprising five primary packages that cover a wide spectrum of interactions. These range from discrete, basic touch events (e.g., double tap, long press), to continuous swipe and drag interactions (Drag/Pan), up to multi-finger combinations and complex geometric transformations (such as simultaneous pinch-to-zoom and rotation). The core architectural design of the project relies on migrating gesture processing entirely to the Native UI Thread. By leveraging \textit{react-native-gesture-handler} alongside shared values from \textit{Reanimated}, the framework eliminates bridge-related bottlenecks. Furthermore, the architecture extends its capabilities to integrate hardware sensor data (e.g., proximity sensors) and a high-performance drawing engine tailored for digital signature applications and advanced continuous interactions.
+
+Architectural evaluations demonstrate the success of this approach in achieving near-instantaneous interaction and providing high referential stability. By delivering a clean and stable Application Programming Interface (API) through custom React Hooks, the framework offers a radical solution that facilitates the integration of complex kinematic interactions into the broader developer community's applications. This ultimately enhances the quality of user experiences across different platforms without compromising responsiveness.
+\par\endgroup
+
+% -------------------- TOC / LOF / LOT --------------------
+\listoftables
+\listoffigures
+\tableofcontents
+
+% -------------------- LIST OF ABBREVIATIONS --------------------
+\begin{Arabic}
+\chapter*{قائمة الاختصارات}
+\end{Arabic}
+
+\begin{tabular}{@{}ll@{}}
+\textbf{UI/UX} & User Interface / User Experience \\
+\textbf{HAL}   & Hardware Abstraction Layer \\
+\textbf{API}   & Application Programming Interface \\
+\textbf{NPM}   & Node Package Manager \\
+\end{tabular}
+
+% -------------------- GLOSSARY --------------------
+\begin{Arabic}
+\chapter*{مسرد المصطلحات}
+
+\begin{description}
+\item[واجهة برمجة التطبيقات (API)] مجموعة من القواعد والبروتوكولات التي تسمح لتطبيقات البرامج المختلفة بالتواصل مع بعضها البعض.
+
+\item[الجسر (The Bridge)] آلية في React Native تسمح لبيئة JavaScript بالتواصل مع الواجهات الأصلية للنظام لمعالجة الإيماءات.
+
+\item[الشاشة السعوية (Capacitive Screen)] تقنية شاشات اللمس الحديثة التي تعتمد على الخصائص الكهربائية لجسم الإنسان لاستشعار اللمس المتعدد.
+
+\item[واجهة المستخدم (UI) وتجربة المستخدم (UX)] واجهة المستخدم تشير إلى العناصر المرئية للتطبيق، بينما تشير تجربة المستخدم إلى الانسيابية وسرعة الاستجابة أثناء تفاعل المستخدم مع النظام.
+\end{description}
+\end{Arabic}
+
+% ============================================================
+%  PART 2: MAIN BODY
+%  Arabic numeral page numbering
+% ============================================================
+\pagenumbering{arabic}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+
+% Include all chapters
+\input{1_INTRODUCTION}
+\input{2_LITERATURE_REVIEW}
+\input{3_METHODOLOGY_SYSTEM_ARCHITECTURE}
+\input{4_IMPLEMENTATION}
+\input{5_CONCLUSION}
+\input{6_REFERENCES}
+
+\end{document}

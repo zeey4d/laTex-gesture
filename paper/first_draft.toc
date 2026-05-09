@@ -1,0 +1,104 @@
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {chapter}{\numberline {1}المقدمة}{2}{chapter.1}%
+\contentsline {section}{\numberline {1.1}خلفية الدراسة}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}مشكلة البحث}{3}{section.1.2}%
+\contentsline {section}{\numberline {1.3}أهداف المشروع}{4}{section.1.3}%
+\contentsline {section}{\numberline {1.4}هيكل المكتبة --- نظرة عامة}{4}{section.1.4}%
+\contentsline {section}{\numberline {1.5}أهمية الدراسة}{4}{section.1.5}%
+\contentsline {section}{\numberline {1.6}نطاق الدراسة وحدودها}{5}{section.1.6}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {chapter}{\numberline {2}الإطار النظري والدراسات السابقة}{6}{chapter.2}%
+\contentsline {section}{\numberline {2.1}أنظمة معالجة الإيماءات في تطبيقات الهواتف المحمولة}{7}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}تطور أطر معالجة الإيماءات}{7}{subsection.2.1.1}%
+\contentsline {section}{\numberline {2.2}تصنيف الإيماءات اللمسية وخصائصها التقنية}{7}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}المعمارية الداخلية لأنظمة التعرف على الإيماءات}{8}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}التحديات التقنية في تطوير مكتبات الإيماءات متعددة المنصات}{8}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}مشكلة تأخر الجسر والحلول الحديثة}{8}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}إدارة تضارب الإيماءات}{9}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}مكتبات الإيماءات والأنماط المعمارية للمكتبات مفتوحة المصدر}{9}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}مبادئ تصميم المكتبات القابلة لإعادة الاستخدام}{9}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}نمط الخطافات في منظومة React}{9}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}نظم الحساسات الداخلية في الأجهزة المحمولة}{9}{section.2.5}%
+\contentsline {section}{\numberline {2.6}خلاصة الإطار النظري}{10}{section.2.6}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {chapter}{\numberline {3}المنهجية وبنية النظام}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}منهجية البحث والتصميم}{12}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}تحليل المتطلبات}{12}{subsection.3.1.1}%
+\contentsline {section}{\numberline {3.2}تصميم معمارية النظام المتكاملة}{12}{section.3.2}%
+\contentsline {section}{\numberline {3.3}اختيار الخوارزميات وتكاملها}{13}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}خوارزميات التعلم الآلي الأساسية}{13}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}توليد المرشحين}{14}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}جمع البيانات، السياق اللغوي، ومواد تدريب النموذج}{14}{section.3.4}%
+\contentsline {section}{\numberline {3.5}تدفق النظام ومسار التوصية}{14}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}استيعاب البيانات وبنية القياس عن بعد}{14}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}مسار التدريب غير المتصل (التحليل العواملي الكامن)}{15}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}مسار الاسترجاع المتصل}{15}{subsection.3.5.3}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {chapter}{\numberline {4}التنفيذ والنتائج}{16}{chapter.4}%
+\contentsline {section}{\numberline {4.1}نظرة عامة على هيكل التنفيذ}{17}{section.4.1}%
+\contentsline {section}{\numberline {4.2}الحزمة الأولى: إيماءات اللمس الأساسي}{17}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}المفهوم والبنية}{17}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}مثال تطبيقي: إيماءة الضغطة الواحدة}{17}{subsection.4.2.2}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.2.3}مثال تطبيقي: الضغطة المزدوجة والضغط المطوّل}{18}{subsection.4.2.3}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {section}{\numberline {4.3}الحزمة الثانية: إيماءات السحب والحركة}{19}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}المفهوم والتصنيف}{19}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}مثال تطبيقي: بطاقة قابلة للسحب}{20}{subsection.4.3.2}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {section}{\numberline {4.4}الحزمة الثالثة: الإيماءات متعددة الأصابع}{21}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}الأسس الرياضية}{21}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}مثال تطبيقي: تكبير الصور بإيماءة القرص}{22}{subsection.4.4.2}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {section}{\numberline {4.5}الحزمة الرابعة: إيماءات حساس التقارب}{23}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}مبدأ عمل حساس التقارب}{23}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}نظام الأنواع لحزمة التقارب}{23}{subsection.4.5.2}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.5.3}مثال تطبيقي: إيقاظ الشاشة بالتقارب}{24}{subsection.4.5.3}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.5.4}مثال تطبيقي: الضغطة الهوائية بدون لمس}{25}{subsection.4.5.4}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {section}{\numberline {4.6}الحزمة الخامسة: إيماءات الحساسات الحركية}{26}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}الحساسات المدعومة والأنواع المعرّفة}{26}{subsection.4.6.1}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.6.2}الإيماءات الحركية المدعومة}{27}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}مثال تطبيقي: إيماءة الهز لتحديث البيانات}{27}{subsection.4.6.3}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.6.4}مثال تطبيقي: إمالة الجهاز للتحكم في الكاميرا}{28}{subsection.4.6.4}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {subsection}{\numberline {4.6.5}مثال تطبيقي: دمج التقارب والحساسات}{29}{subsection.4.6.5}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {section}{\numberline {4.7}تقييم الأداء والمقارنة}{31}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}نتائج قياسات الأداء}{31}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}مناقشة النتائج}{31}{subsection.4.7.2}%
+\xpg@aux {}{english}
+\xpg@aux {}{arabic}
+\contentsline {chapter}{\numberline {5}الخاتمة والتوصيات}{33}{chapter.5}%
+\contentsline {section}{\numberline {5.1}ملخص النتائج}{34}{section.5.1}%
+\contentsline {section}{\numberline {5.2}الخاتمة}{34}{section.5.2}%
+\contentsline {section}{\numberline {5.3}التوصيات والأعمال المستقبلية}{35}{section.5.3}%
+\xpg@aux {}{english}
+\contentsline {chapter}{Bibliography}{36}{chapter*.18}%

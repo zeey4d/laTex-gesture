@@ -1,0 +1,121 @@
+\documentclass[12pt,a4paper]{report}
+
+% ============================================================
+%  IEEE-Compliant FYP LaTeX Template
+%  Based on Project_Guidelines.pdf
+% ============================================================
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}                          % Times New Roman (mandatory)
+\usepackage[left=1.5in,top=1in,bottom=1in,right=1in]{geometry} % Binding margin
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[nottoc]{tocbibind}
+\usepackage{parskip}
+\usepackage{caption}
+\usepackage{url}
+\usepackage{fancyhdr}
+
+% --- Settings ---
+\doublespacing
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% Chapter title formatting
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\centering}
+  {CHAPTER \thechapter}{0pt}{\Huge}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+% ============================================================
+\begin{document}
+
+% Front matter: Roman numerals
+\pagenumbering{roman}
+
+% -------------------- TITLE PAGE --------------------
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\fontsize{22}{26}\selectfont\bfseries PROJECT TITLE HERE\par}
+\vspace{1.5cm}
+{\large A Final Year Project Report\\
+Submitted in partial fulfillment of the requirements for the\\
+Degree of Bachelor of Science in Software Engineering\par}
+\vspace{2cm}
+{\fontsize{14}{18}\selectfont\bfseries Submitted by:\par}
+\vspace{0.5cm}
+{\fontsize{14}{18}\selectfont
+Student Name 1\\
+Student Name 2\par}
+\vspace{1.5cm}
+{\fontsize{14}{18}\selectfont\bfseries Supervised by:} {\fontsize{14}{18}\selectfont Dr.\ Supervisor Name\par}
+\vspace{2cm}
+{\fontsize{14}{18}\selectfont
+College of Engineering and Information Technology\\
+Taiz University\\
+Taiz, Yemen\\
+Month Year\par}
+\end{titlepage}
+
+% -------------------- DECLARATION --------------------
+\chapter*{DECLARATION}
+\addcontentsline{toc}{chapter}{Declaration}
+% TODO: Write declaration text here.
+
+% -------------------- APPROVAL PAGE --------------------
+\chapter*{APPROVAL PAGE}
+\addcontentsline{toc}{chapter}{Approval Page}
+% TODO: Add approval/certification content and signature lines.
+
+% -------------------- DEDICATION --------------------
+\chapter*{DEDICATION}
+\addcontentsline{toc}{chapter}{Dedication}
+% TODO: Write dedication text here (optional).
+
+% -------------------- ACKNOWLEDGEMENTS --------------------
+\chapter*{ACKNOWLEDGEMENTS}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+% TODO: Write acknowledgements here (optional).
+
+% -------------------- ABSTRACT --------------------
+\chapter*{ABSTRACT}
+\addcontentsline{toc}{chapter}{Abstract}
+% TODO: Write abstract here (150-250 words, max 1 page).
+
+% -------------------- TOC / LOF / LOT --------------------
+\tableofcontents
+\listoffigures
+\listoftables
+
+% -------------------- ABBREVIATIONS --------------------
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\begin{tabular}{@{}ll@{}}
+% \textbf{ABBR} & Definition \\
+\end{tabular}
+
+% -------------------- GLOSSARY --------------------
+\chapter*{Glossary}
+\addcontentsline{toc}{chapter}{Glossary}
+\begin{description}
+% \item[Term] Definition.
+\end{description}
+
+% ============================================================
+% Main body: Arabic numerals
+\pagenumbering{arabic}
+
+% Include all chapters from separate file
+\input{chapters}
+
+\end{document}

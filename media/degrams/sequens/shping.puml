@@ -1,0 +1,220 @@
+@startuml SMSA_Shipping_Integration
+autonumber
+skinparam boxPadding 10
+skinparam participantPadding 10
+skinparam style strictuml
+
+title SMSA Shipping Integration (Admin Flow)
+
+actor "Admin" as Admin
+box "Frontend (Next.js Admin)" #E3F2FD
+    participant "Order Details" as NextPage
+end box
+
+box "Backend (Laravel)" #E8F5E9
+    participant "AdminShippingController" as API
+    participant "SmsaService" as Service
+end box
+
+box "Database" #FFF8E1
+    participant "oc_order" as OrderTB
+    participant "oc_smsa" as SmsaTB
+    participant "oc_order_history" as HistoryTB
+end box
+
+box "External API" #ECEFF1
+    participant "SMSA Express API" as SMSA
+end box
+
+== Create Shipment ==
+
+Admin -> NextPage: Click "Generate SMSA AWB"
+activate NextPage
+
+NextPage -> API: POST /api/v1/admin/shipping/smsa/create\n{ order_id: 1001 }
+activate API
+
+note right of API
+    Validator::make validates:
+    order_id => required|integer
+end note
+
+API -> OrderTB: SELECT order_id, firstname, lastname,\nemail, telephone, shipping_firstname,\nshipping_lastname, shipping_city,\nshipping_address_1, shipping_address_2,\nshipping_postcode, shipping_country,\ntotal, currency_code\nFROM oc_order WHERE order_id = 1001
+activate OrderTB
+OrderTB --> API: Order Data
+deactivate OrderTB
+
+API -> SmsaTB: SELECT * FROM oc_smsa\nWHERE order_id = 1001
+activate SmsaTB
+SmsaTB --> API: NULL (no existing shipment)
+deactivate SmsaTB
+
+API -> API: DB::beginTransaction()
+
+API -> Service: createShipment(orderData)
+activate Service
+
+note right of Service
+    mapOrderToSmsaParams():
+    passKey = config('services.smsa.passkey')
+    refNo = order_id
+    cName = shipping_firstname + shipping_lastname
+    cCity = shipping_city
+    cMobile = telephone
+    cAddr1 = shipping_address_1
+    cAddr2 = shipping_address_2
+    cZip = shipping_postcode
+    cntry = shipping_country
+    shipType = 'DLV'
+    custVal = total
+    custCurr = currency_code
+end note
+
+Service -> SMSA: POST {baseUrl}/addShipment\n(passKey, refNo, cName, cCity,\ncMobile, cAddr1, cZip, weight...)
+activate SMSA
+
+alt Success Response
+    SMSA --> Service: 200 OK\nBody: "290012345" (AWB Number)
+    
+    Service --> API: { success: true,\nawb_number: "290012345" }
+    deactivate Service
+    
+    API -> SmsaTB: INSERT INTO oc_smsa\n(order_id, awb_number, reference_number,\npickup_date, shipment_label, status, date_added)\nVALUES (1001, "290012345", "REF1001",\nNOW(), NULL, "Shipped", NOW())
+    activate SmsaTB
+    SmsaTB --> API: consignment_id = 123 (insertGetId)
+    deactivate SmsaTB
+
+    API -> HistoryTB: INSERT INTO oc_order_history\n(order_id, order_status_id, notify,\ncomment, date_added)\nVALUES (1001, 3, 1,\n"SMSA Shipment Created - AWB: 290012345", NOW())
+    activate HistoryTB
+    HistoryTB --> API: inserted
+    deactivate HistoryTB
+    
+    API -> OrderTB: UPDATE oc_order\nSET order_status_id = 3,\ndate_modified = NOW()\nWHERE order_id = 1001
+    activate OrderTB
+    OrderTB --> API: updated
+    deactivate OrderTB
+
+    API -> API: DB::commit()
+
+    API --> NextPage: 201 Created\n{ success: true,\nmessage: "Shipment created successfully",\ndata: { consignment_id: 123,\nawb_number: "290012345",\norder_id: 1001 } }
+    
+    NextPage -> Admin: Show Success + "Print Label" Button
+
+else SMSA Error Response
+    SMSA --> Service: Error Message in Body
+    deactivate SMSA
+    
+    Service --> API: { success: false,\nerror: "Invalid City" }
+    deactivate Service
+    
+    API -> API: DB::rollBack()
+    
+    API --> NextPage: 400 Bad Request\n{ success: false,\nmessage: "SMSA shipment creation failed",\nerror: "Invalid City" }
+    deactivate API
+    
+    NextPage -> Admin: Show Error Notification
+end
+
+== Print Label ==
+
+Admin -> NextPage: Click "Print Label"
+NextPage -> API: GET /api/v1/admin/shipping/smsa/label/{awb}
+activate API
+
+API -> SmsaTB: SELECT * FROM oc_smsa\nWHERE awb_number = "290012345"
+activate SmsaTB
+SmsaTB --> API: shipment record
+deactivate SmsaTB
+
+alt shipment_label NOT NULL (Cached)
+    API -> API: base64_decode(shipment_label)
+    API --> NextPage: Response with PDF\nContent-Type: application/pdf\nContent-Disposition: inline;\nfilename="SMSA-290012345.pdf"
+
+else shipment_label IS NULL (Not Cached)
+    API -> Service: getLabel("290012345")
+    activate Service
+    
+    Service -> SMSA: POST {baseUrl}/getPDF\n(passKey, awbNo)
+    activate SMSA
+    SMSA --> API: PDF Binary Data
+    deactivate SMSA
+    
+    Service --> API: { success: true,\npdf_data: <binary>,\ncontent_type: "application/pdf" }
+    deactivate Service
+    
+    API -> SmsaTB: UPDATE oc_smsa\nSET shipment_label = base64_encode(pdf_data)\nWHERE awb_number = "290012345"
+    activate SmsaTB
+    SmsaTB --> API: updated
+    deactivate SmsaTB
+    
+    API --> NextPage: Response with PDF\nContent-Type: application/pdf
+end
+deactivate API
+
+NextPage -> Admin: Opens PDF in new tab
+
+== Track Shipment ==
+
+Admin -> NextPage: Click "Track Shipment"
+NextPage -> API: GET /api/v1/admin/shipping/smsa/track/{awb}
+activate API
+
+API -> SmsaTB: SELECT * FROM oc_smsa\nWHERE awb_number = "290012345"
+activate SmsaTB
+SmsaTB --> API: shipment record
+deactivate SmsaTB
+
+API -> Service: trackShipment("290012345")
+activate Service
+
+Service -> SMSA: POST {baseUrl}/getTracking\n(passKey, awbNo)
+activate SMSA
+SMSA --> Service: Tracking Info JSON
+deactivate SMSA
+
+Service --> API: { success: true,\ntracking: {...} }
+deactivate Service
+
+API --> NextPage: 200 OK\n{ success: true,\ndata: { consignment_id, order_id,\nawb_number, tracking: {...} } }
+deactivate API
+
+NextPage -> Admin: Display Tracking Timeline
+
+== Cancel Shipment ==
+
+Admin -> NextPage: Click "Cancel Shipment"
+NextPage -> API: POST /api/v1/admin/shipping/smsa/cancel/{awb}\n{ reason: "Customer request" }
+activate API
+
+API -> SmsaTB: SELECT * FROM oc_smsa\nWHERE awb_number = "290012345"
+activate SmsaTB
+SmsaTB --> API: shipment record
+deactivate SmsaTB
+
+API -> Service: cancelShipment("290012345", "Customer request")
+activate Service
+
+Service -> SMSA: POST {baseUrl}/cancelShipment\n(passKey, awbNo, reason)
+activate SMSA
+SMSA --> Service: Success confirmation
+deactivate SMSA
+
+Service --> API: { success: true,\nmessage: "Shipment cancelled" }
+deactivate Service
+
+API -> SmsaTB: UPDATE oc_smsa\nSET status = "Cancelled"\nWHERE awb_number = "290012345"
+activate SmsaTB
+SmsaTB --> API: updated
+deactivate SmsaTB
+
+API -> HistoryTB: INSERT INTO oc_order_history\n(order_id, order_status_id, notify,\ncomment, date_added)\nVALUES (1001, 1001, 0,\n"SMSA Shipment Cancelled - AWB: 290012345.\nReason: Customer request", NOW())
+activate HistoryTB
+HistoryTB --> API: inserted
+deactivate HistoryTB
+
+API --> NextPage: 200 OK\n{ success: true,\nmessage: "Shipment cancelled successfully",\ndata: { awb_number, order_id } }
+deactivate API
+
+NextPage -> Admin: Show Cancellation Confirmation
+
+@enduml

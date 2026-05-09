@@ -1,0 +1,78 @@
+@startuml
+autonumber
+skinparam boxPadding 10
+skinparam participantPadding 10
+skinparam style strictuml
+
+title Guest to User Cart Merge Flow
+
+actor "User (Guest)" as Guest
+box "Frontend (Next.js)" #E3F2FD
+    participant "Cart Context" as FE_Cart
+    participant "Auth Service" as FE_Auth
+end box
+
+box "Backend (Laravel)" #E8F5E9
+    participant "CartController" as BE_Cart
+    participant "AuthController" as BE_Auth
+end box
+
+box "Database" #FFF8E1
+    participant "oc_cart" as DB_Cart
+    participant "oc_customer" as DB_User
+end box
+
+== Phase 1: Guest Adds to Cart ==
+
+note right of FE_Cart
+    Frontend generates a random UUID
+    stored in LocalStorage
+    e.g., "guest_sess_9988"
+end note
+
+Guest -> FE_Cart: Clicks "Add to Cart"
+FE_Cart -> BE_Cart: POST /api/cart/add\nHeader: X-Guest-Session: guest_sess_9988\n{ product_id: 50, qty: 1 }
+
+activate BE_Cart
+BE_Cart -> DB_Cart: INSERT INTO oc_cart\n(customer_id=0, session_id="guest_sess_9988", product_id=50...)
+activate DB_Cart
+DB_Cart --> BE_Cart: Success
+deactivate DB_Cart
+BE_Cart --> FE_Cart: 200 OK (Cart Updated)
+deactivate BE_Cart
+
+== Phase 2: Guest Logs In (The Merge) ==
+
+Guest -> FE_Auth: Enters Credentials & Clicks Login
+FE_Auth -> BE_Auth: POST /api/auth/login\n{ email, password, guest_session_id: "guest_sess_9988" }
+activate BE_Auth
+
+BE_Auth -> DB_User: Validate Credentials
+activate DB_User
+DB_User --> BE_Auth: Valid (User ID: 101)
+deactivate DB_User
+
+note right of BE_Auth
+    **MERGE LOGIC:**
+    1. Find items where session_id="guest_sess_9988"
+    2. Check if User 101 already has these items.
+    3. If yes, update quantity.
+    4. If no, update customer_id=101 and clear session_id.
+end note
+
+BE_Auth -> DB_Cart: SELECT * FROM oc_cart\nWHERE session_id="guest_sess_9988" AND customer_id=0
+activate DB_Cart
+DB_Cart --> BE_Auth: [Item A (Prod 50, Qty 1)]
+deactivate DB_Cart
+
+BE_Auth -> DB_Cart: UPDATE oc_cart SET customer_id=101, session_id=''\nWHERE cart_id=...
+activate DB_Cart
+DB_Cart --> BE_Auth: Updated
+deactivate DB_Cart
+
+BE_Auth --> FE_Auth: 200 OK\n{ token: "...", user: {...}, message: "Cart Merged" }
+deactivate BE_Auth
+
+FE_Auth -> FE_Cart: Clear Guest Session ID\nRefresh Cart from API (Now using User Token)
+
+@enduml

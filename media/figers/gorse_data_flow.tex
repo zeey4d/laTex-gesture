@@ -1,0 +1,53 @@
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    font=\sffamily,
+    % Styles
+    client/.style={rectangle, rounded corners, draw=blue!60, fill=blue!10, very thick, minimum width=2.5cm, minimum height=1cm, align=center},
+    server/.style={rectangle, rounded corners, draw=green!60!black, fill=green!10, very thick, minimum width=2.5cm, minimum height=1cm, align=center},
+    gorse/.style={rectangle, draw=orange!80, fill=orange!10, very thick, minimum width=2.5cm, minimum height=1cm, align=center},
+    db/.style={cylinder, shape border rotate=90, draw=gray!80, fill=gray!20, aspect=0.25, very thick, minimum width=2cm, minimum height=2cm, align=center},
+    cache/.style={cylinder, shape border rotate=90, draw=red!60, fill=red!10, aspect=0.25, very thick, minimum width=2cm, minimum height=2cm, align=center},
+    arrow/.style={-{Stealth[scale=1.2]}, thick},
+    dashed arrow/.style={-{Stealth[scale=1.2]}, thick, dashed},
+    cluster/.style={rectangle, draw=orange!50, dashed, thick, inner sep=15pt, rounded corners}
+]
+
+% Nodes
+\node[client] (web) {Web Frontend\\(App/Browser)};
+\node[server, right=of web] (main) {Main Application\\Server};
+
+% Gorse Cluster Nodes
+\node[gorse, right=of main] (gorseserver) {server-1\\(:8087)};
+
+\node[db, above right=1cm and 1.5cm of gorseserver] (mysql) {mysql-1\\(DB :3306)};
+\node[cache, below right=1cm and 1.5cm of gorseserver] (redis) {redis-1\\(Cache :6379)};
+
+\node[gorse, right=2cm of mysql] (worker) {worker-1\\(:8089)};
+\node[gorse, right=2cm of redis] (master) {master-1\\(:8086)};
+
+% Cluster Background
+\begin{scope}[on background layer]
+    \node[cluster, fill=orange!5, fit=(gorseserver)(mysql)(redis)(worker)(master)] (cluster_box) {};
+    \node[anchor=north, font=\sffamily\bfseries\color{orange!80!black}] at (cluster_box.north) {Gorse Container Cluster};
+\end{scope}
+
+% External Paths
+\draw[arrow] ([yshift=5pt]web.east) -- node[above, font=\scriptsize] {1. Event / Req} ([yshift=5pt]main.west);
+\draw[arrow] ([yshift=-5pt]main.west) -- node[below, font=\scriptsize] {15. Deliver UI} ([yshift=-5pt]web.east);
+
+\draw[arrow] ([yshift=5pt]main.east) -- node[above, font=\scriptsize] {3,11. REST API} ([yshift=5pt]gorseserver.west);
+\draw[arrow] ([yshift=-5pt]gorseserver.west) -- node[below, font=\scriptsize] {13. Rec IDs} ([yshift=-5pt]main.east);
+
+% Internal Paths (Server)
+\draw[arrow] (gorseserver.north) |- node[near end, above, font=\scriptsize] {4. Save Event} (mysql.west);
+\draw[arrow] (redis.west) -| node[near start, above, font=\scriptsize] {12. Fetch Recs} (gorseserver.south);
+
+% Master
+\draw[arrow] (master.west) -- node[above, font=\scriptsize] {6. Assign Task} (redis.east);
+\draw[dashed arrow] (master.north) -- node[right, font=\scriptsize] {5. Manage} (worker.south);
+
+% Worker
+\draw[arrow] (mysql.east) -- node[above, font=\scriptsize] {7. Pull Data} (worker.west);
+\draw[arrow] (worker.south) ++(-0.5,0) coordinate (w_s) -- node[left, font=\scriptsize] {9. Save Recs} (w_s |- redis.north);
+
+\end{tikzpicture}
